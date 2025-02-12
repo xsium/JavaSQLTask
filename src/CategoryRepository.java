@@ -29,8 +29,36 @@ public class CategoryRepository {
             }
         }
     }
+    public static int addCategoryDBfromString(String category) {
+        if (findCategoryByName(category) != null) {
+            return findCategoryByName(category).getId();
+
+        } else {
+            try {
+                //requête SQL
+                String sql = "INSERT INTO category (name) VALUES (?)";
+                //Préparation de la requête
+                PreparedStatement preparedStatement = connect.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+                //Bind des paramètres
+                preparedStatement.setString(1, category);
+                //Exécution de la requête
+                int addedRows = preparedStatement.executeUpdate();
+                //test si l'enregistrement est ok, sinon on retire le livre de la library locale
+                if (addedRows > 0) {
+                    System.out.println("Category successfully added!");
+                    ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getInt(1); // Return new category ID
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return -1;
+        }
+    }
     public static Category findCategoryByName( String name) {
-        String query = "SELECT id, name FROM category WHERE id = ?";
+        String query = "SELECT id, name FROM category WHERE name = ?";
         try (PreparedStatement statement = connect.prepareStatement(query)) {
             statement.setString(1, name);
             ResultSet rs = statement.executeQuery();
@@ -41,7 +69,7 @@ public class CategoryRepository {
                 );
             }
         } catch (SQLException e) {
-            System.out.println("Erreur lors de la récupération : " + e.getMessage());
+            System.out.println("Erreur lors de la récupération findcatbyname : " + e.getMessage());
         }
         return null;
     }

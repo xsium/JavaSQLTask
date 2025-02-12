@@ -25,7 +25,7 @@ public class AccountRepository {
                 int addedRows = preparedStatement.executeUpdate();
                 //test si l'enregistrement est ok, sinon on retire le livre de la library locale
                 if (addedRows > 0) {
-                    System.out.println("Account successfully added!");
+                    System.out.println("Account successfully Created!");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -33,7 +33,7 @@ public class AccountRepository {
         }
     }
     public static Account getAccountByEmail(String email) {
-        String query = "SELECT id, firstname, lastname, email, password FROM account WHERE id = ?";
+        String query = "SELECT id, firstname, lastname, email, password FROM account WHERE email = ?";
         try {
             PreparedStatement statement = connect.prepareStatement(query);
             statement.setString(1, email);
@@ -46,6 +46,22 @@ public class AccountRepository {
                         rs.getString("email"),
                         rs.getString("password")
                 );
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur lors de la récupération : " + e.getMessage());
+        }
+        return null;
+    }
+    public static String getAccountById(int id) {
+        String query = "SELECT firstname, lastname FROM account WHERE id = ?";
+        try {
+            PreparedStatement statement = connect.prepareStatement(query);
+            statement.setInt(1, id);
+            ResultSet rs = statement.executeQuery();
+            String result;
+            if (rs.next()) {
+                result= rs.getString("firstname")+" "+rs.getString("lastname");
+                return result;
             }
         } catch (SQLException e) {
             System.out.println("Erreur lors de la récupération : " + e.getMessage());

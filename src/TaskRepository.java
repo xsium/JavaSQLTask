@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class TaskRepository {
@@ -15,7 +16,7 @@ public class TaskRepository {
                 //requête SQL
                 String sql = "INSERT INTO task (title, description, createAt, status, account_id) VALUES (?, ?, ?, ?, ?)";
                 //Préparation de la requête
-                PreparedStatement preparedStatement = connect.prepareStatement(sql);
+                PreparedStatement preparedStatement = connect.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
                 //Bind des paramètres
                 preparedStatement.setString(1, task.getTitle());
                 preparedStatement.setString(2, task.getDescription());
@@ -24,6 +25,19 @@ public class TaskRepository {
                 preparedStatement.setInt(5, task.getAccountId());
                 //Exécution de la requête
                 int addedRows = preparedStatement.executeUpdate();
+                ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+                int taskId = -1;
+                if (generatedKeys.next()) {
+                    taskId = generatedKeys.getInt(1);
+                }
+                if (task.getCategories() != null) {
+                    for (String category : task.getCategories()) {
+                        int categoryId=CategoryRepository.addCategoryDBfromString(category);
+                        if (categoryId != -1) {
+                            linkTaskWithCategory(taskId, categoryId);
+                        }
+                    }
+                }
                 //test si l'enregistrement est ok, sinon on retire le livre de la library locale
                 if (addedRows > 0) {
                     System.out.println("Task successfully added!");
@@ -33,41 +47,63 @@ public class TaskRepository {
             }
         }
     }
+    private static void linkTaskWithCategory(int taskId, int categoryId) {
+        try {
+            String sql = "INSERT INTO task_category (task_id, category_id) VALUES (?, ?)";
+            PreparedStatement statement = connect.prepareStatement(sql);
+            statement.setInt(1, taskId);
+            statement.setInt(2, categoryId);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Error linking task with category: " + e.getMessage());
+        }
+    }
+
     public static Task getTaskById(int id) {
-        String query = "SELECT id,title,description,createAt,status,account_id FROM task WHERE id = ?";
+        String query = "SELECT t.id as task_id, t.title,t.description,t.createAt,t.status,GROUP_CONCAT(c.name SEPARATOR ', ') AS categories FROM task t JOIN task_category tc ON t.id = tc.task_id JOIN category c ON tc.category_id = c.id WHERE t.id = ? GROUP BY t.id, t.title, t.description, t.createAt, t.status";
         try {
             PreparedStatement statement = connect.prepareStatement(query);
             statement.setInt(1, id);
             ResultSet rs = statement.executeQuery();
             if (rs.next()) {
+                ArrayList<String> categories = new ArrayList<>();
+                if (rs.getString("categories") != null) {
+                    Collections.addAll(categories, rs.getString("categories").split(", "));
+                }
                 return new Task(
-                        rs.getInt("id"),
+                        rs.getInt("task_id"),
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getTimestamp("createAt"),
                         rs.getBoolean("status"),
-                        rs.getInt("account_id")
+                        rs.getInt("account_id"),
+                        categories
                 );
             }
         } catch (SQLException e) {
-            System.out.println("Erreur lors de la récupération : " + e.getMessage());
+            System.out.println("Erreur lors de la récupération taskbyID : " + e.getMessage());
         }
         return null;
     }
     public static ArrayList<Task> findAll() {
         ArrayList<Task> tasks = new ArrayList<>();
-        String query = "SELECT id,title,description,createAt,status,account_id FROM task";
+        String query = "SELECT t.id as task_id, t.title,t.description,t.createAt,t.status, GROUP_CONCAT(c.name SEPARATOR ', ') AS categories FROM task t JOIN task_category tc ON t.id = tc.task_id JOIN category c ON tc.category_id = c.id GROUP BY t.id, t.title, t.description, t.createAt, t.status";
         try (Statement statement = connect.createStatement();
              ResultSet rs = statement.executeQuery(query)) {
 
             while (rs.next()) {
+                ArrayList<String> categories = new ArrayList<>();
+                if (rs.getString("categories") != null) {
+                    Collections.addAll(categories, rs.getString("categories").split(", "));
+                }
                 tasks.add(new Task(
-                        rs.getInt("id"),
+                        rs.getInt("task_id"),
                         rs.getString("title"),
                         rs.getString("description"),
                         rs.getTimestamp("createAt"),
                         rs.getBoolean("status"),
-                        rs.getInt("account_id")
+                        rs.getInt("account_id"),
+                        categories
                 ));
             }
         } catch (SQLException e) {

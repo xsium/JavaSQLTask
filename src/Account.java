@@ -63,7 +63,7 @@ public class Account {
         System.out.println(id);
         System.out.println("Enter the firstname:");
         String firstname= sc.nextLine();
-        System.out.println("Entrer the lastname:");
+        System.out.println("Enter the lastname:");
         String lastname= sc.nextLine();
         System.out.println("Enter the mail :");
         String mail= sc.nextLine();

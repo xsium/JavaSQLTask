@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -8,6 +9,7 @@ public class Task {
     private Date createAt;
     private boolean status;
     private int accountId;
+    private ArrayList<String> categories;
 
     public Task() {
         this.id = -1;
@@ -16,15 +18,17 @@ public class Task {
         this.createAt = new Date();
         this.status = false;
         this.accountId = -1;
+        this.categories=null;
     }
 
-    public Task(int id, String title, String description, Date createAt, boolean status, int accountId) {
+    public Task(int id, String title, String description, Date createAt, boolean status, int accountId, ArrayList<String> categories) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.createAt = createAt;
         this.status = status;
         this.accountId = accountId;
+        this.categories=categories;
     }
 
     //getters
@@ -46,6 +50,9 @@ public class Task {
     public int getAccountId() {
         return accountId;
     }
+    public ArrayList<String> getCategories() {
+        return categories;
+    }
 
     //setters
     public void setId(int id) {
@@ -66,6 +73,10 @@ public class Task {
     public void setAccountId(int accountId) {
         this.accountId = accountId;
     }
+    public void setCategories(ArrayList<String> categories) {
+        this.categories = categories;
+    }
+
     //methods
     public static Task create(Scanner sc, Account account){
         System.out.println("this is your temporary ID:");
@@ -73,12 +84,34 @@ public class Task {
         System.out.println(id);
         System.out.println("Enter the title:");
         String title= sc.nextLine();
-        System.out.println("Entrer the description:");
+        System.out.println("Enter the description:");
         String description= sc.nextLine();
         Date date= new Date();
         boolean status = false;
         int accountId = account.getId();
-        return new Task (id, title, description, date, status, accountId);
+        ArrayList<String> categories= new ArrayList<String>();
+        boolean catLoop=true;
+        while(catLoop){
+            System.out.println("Enter the categories of the task, use 'ok' to validate your entries,'reset' to clear all previous categories, 'cancel' to redo the last entry");
+            String category= sc.nextLine();
+            switch (category) {
+                case "ok":
+                    catLoop=false;
+                    break;
+
+                case "reset":
+                    categories.clear();
+                    break;
+
+                case "cancel":
+                    categories.removeLast();
+                    break;
+
+                default:
+                    categories.add(category);
+            }
+        }
+        return new Task (id, title, description, date, status, accountId, categories);
     }
     public void display(){
         System.out.println("Task ID: "+ this.getId());
@@ -86,7 +119,7 @@ public class Task {
         System.out.println("Task Description: "+ this.getDescription());
         System.out.println("Task Status: "+ (this.getStatus()?"Validé":"À Faire"));
         System.out.println("Task Created: "+ this.getCreateAt());
-        System.out.println("Task Linked Account ID: "+ this.getAccountId());
+        System.out.println("Author: "+ AccountRepository.getAccountById(this.getAccountId()));
     }
 
 }
