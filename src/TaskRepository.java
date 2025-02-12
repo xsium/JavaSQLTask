@@ -38,7 +38,7 @@ public class TaskRepository {
                         }
                     }
                 }
-                //test si l'enregistrement est ok, sinon on retire le livre de la library locale
+                //test si l'enregistrement est ok
                 if (addedRows > 0) {
                     System.out.println("Task successfully added!");
                 }
