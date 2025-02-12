@@ -20,7 +20,7 @@ public class CategoryRepository {
                 preparedStatement.setString(1, category.getName());
                 //Exécution de la requête
                 int addedRows = preparedStatement.executeUpdate();
-                //test si l'enregistrement est ok, sinon on retire le livre de la library locale
+                //test si l'enregistrement est ok
                 if (addedRows > 0) {
                     System.out.println("Category successfully added!");
                 }
@@ -43,7 +43,7 @@ public class CategoryRepository {
                 preparedStatement.setString(1, category);
                 //Exécution de la requête
                 int addedRows = preparedStatement.executeUpdate();
-                //test si l'enregistrement est ok, sinon on retire le livre de la library locale
+                //test si l'enregistrement est ok
                 if (addedRows > 0) {
                     System.out.println("Category successfully added!");
                     ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
