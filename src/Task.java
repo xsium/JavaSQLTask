@@ -114,12 +114,14 @@ public class Task {
         return new Task (id, title, description, date, status, accountId, categories);
     }
     public void display(){
+        System.out.println("===============================================");
         System.out.println("Task ID: "+ this.getId());
         System.out.println("Task Title: "+ this.getTitle());
         System.out.println("Task Description: "+ this.getDescription());
         System.out.println("Task Status: "+ (this.getStatus()?"Validé":"À Faire"));
         System.out.println("Task Created: "+ this.getCreateAt());
         System.out.println("Author: "+ AccountRepository.getAccountById(this.getAccountId()));
+        System.out.println("===============================================");
     }
 
 }

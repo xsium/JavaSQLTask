@@ -66,9 +66,10 @@ public class Main {
                     switch (query) {
                         case "add":
                             System.out.println("What do your want to add?");
-                            System.out.println("type 1 for an account");
-                            System.out.println("type 2 for a task");
-                            System.out.println("type 3 for a category");
+                            System.out.println("->type 1 for an account");
+                            System.out.println("->type 2 for a task");
+                            System.out.println("->type 3 for a category");
+                            System.out.println("->type 4 to cancel and return to the main menu");
                             query = scanner.nextLine();
                             switch (query) {
                                 case "1":
@@ -78,6 +79,9 @@ public class Main {
                                     break;
                                 case "3":
                                     CategoryRepository.addCategoryDB(Category.create(scanner));
+                                    break;
+                                case "4":
+                                    System.out.println("Returning to main menu");
                                     break;
                                 default:
                                     System.out.println("invalid command");
@@ -131,6 +135,7 @@ public class Main {
         System.out.println("add : allow the user to manually add an entity.");
         System.out.println("displayAllTask : display the list of all the task for the user.");
         System.out.println("ToggleTask : allow the user to change the state of a task.");
+        System.out.println("Logout : allow the user to return to the login.");
         System.out.println("cat : bring out the cute little cats ! I know you wanna pet them.");
         System.out.println("quit : close the library application.");
         System.out.println("-------------------------------------------------");

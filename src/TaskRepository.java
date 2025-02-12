@@ -60,7 +60,7 @@ public class TaskRepository {
     }
 
     public static Task getTaskById(int id) {
-        String query = "SELECT t.id as task_id, t.title,t.description,t.createAt,t.status,GROUP_CONCAT(c.name SEPARATOR ', ') AS categories FROM task t JOIN task_category tc ON t.id = tc.task_id JOIN category c ON tc.category_id = c.id WHERE t.id = ? GROUP BY t.id, t.title, t.description, t.createAt, t.status";
+        String query = "SELECT t.id as task_id, t.title,t.description,t.createAt,t.status, account_id, GROUP_CONCAT(c.name SEPARATOR ', ') AS categories FROM task t JOIN task_category tc ON t.id = tc.task_id JOIN category c ON tc.category_id = c.id WHERE t.id = ? GROUP BY t.id, t.title, t.description, t.createAt, t.status";
         try {
             PreparedStatement statement = connect.prepareStatement(query);
             statement.setInt(1, id);
@@ -87,7 +87,7 @@ public class TaskRepository {
     }
     public static ArrayList<Task> findAll() {
         ArrayList<Task> tasks = new ArrayList<>();
-        String query = "SELECT t.id as task_id, t.title,t.description,t.createAt,t.status, GROUP_CONCAT(c.name SEPARATOR ', ') AS categories FROM task t JOIN task_category tc ON t.id = tc.task_id JOIN category c ON tc.category_id = c.id GROUP BY t.id, t.title, t.description, t.createAt, t.status";
+        String query = "SELECT t.id as task_id, t.title,t.description,t.createAt,t.status, t.account_id, GROUP_CONCAT(c.name SEPARATOR ', ') AS categories FROM task t JOIN task_category tc ON t.id = tc.task_id JOIN category c ON tc.category_id = c.id GROUP BY t.id, t.title, t.description, t.createAt, t.status";
         try (Statement statement = connect.createStatement();
              ResultSet rs = statement.executeQuery(query)) {
 
